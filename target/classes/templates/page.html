@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BrainFuck Interpreter</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+    <h2 class="font-weight-bold mb-4">BrainFuck Interpreter</h2>
+    <div class="row">
+        <div class="col-md-6">
+            <form id="text-form">
+                <div class="form-group">
+                    <label for="textarea1">Brainfuck code</label>
+                    <textarea class="form-control" id="textarea1" rows="3"></textarea>
+                    <button type="button" class="btn btn-primary mt-3" id="submit-button">Submit</button>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="textarea2">Output</label>
+                <textarea class="form-control" id="textarea2" rows="3"></textarea>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- jQuery and Bootstrap Bundle (includes Popper) -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+<!-- Embedded JavaScript -->
+<script>
+    document.getElementById('submit-button').addEventListener('click', function() {
+        var textarea1Value = document.getElementById('textarea1').value;
+
+        fetch('/submit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ data: textarea1Value }),
+        })
+        .then(response => {
+            // Check if the response is JSON
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.indexOf("application/json") !== -1) {
+                return response.json();
+            } else {
+                return response.text(); // Handle non-JSON response
+            }
+        })
+        .then(data => {
+            console.log('Success:', data);
+            if (typeof data === 'object' && data.output) {
+                document.getElementById('textarea2').value = data.output;
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            document.getElementById('textarea2').value = error.message;
+        });
+    });
+</script>
+</body>
+</html>
